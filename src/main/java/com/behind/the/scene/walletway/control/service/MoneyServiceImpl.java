@@ -81,5 +81,36 @@ public class MoneyServiceImpl implements MoneyService {
         return moneyResponse;
     }
 
+    @Override
+    public MoneyDTO updateMoneyRecord(MoneyDTO moneyDTO, Long moneyId) {
+
+        Money fetchedMoneyData = moneyRepository
+                .findById(moneyId)
+                .orElseThrow(() -> new APIException("Money record not found"));
+
+        fetchedMoneyData.setAmount(moneyDTO.getAmount());
+        fetchedMoneyData.setDescription(moneyDTO.getDescription());
+        fetchedMoneyData.setEntryType(moneyDTO.getEntryType());
+        fetchedMoneyData.setEntryCategory(moneyDTO.getEntryCategory());
+        fetchedMoneyData.setEntryMode(moneyDTO.getEntryMode());
+        fetchedMoneyData.setNote(moneyDTO.getNote());
+
+        Money updatedMoneyData = moneyRepository.save(fetchedMoneyData);
+
+        return modelMapper.map(updatedMoneyData, MoneyDTO.class);
+    }
+
+    @Override
+    public String deleteMoneyRecord(Long moneyId) {
+
+        Money moneyData = moneyRepository
+                .findById(moneyId)
+                .orElseThrow(()-> new APIException("Data Not Found"));
+
+        moneyRepository.delete(moneyData);
+
+        return "Successfully Deleted the Data with data id: "+moneyId;
+    }
+
 
 }

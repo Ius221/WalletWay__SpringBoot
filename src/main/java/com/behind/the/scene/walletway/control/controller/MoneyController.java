@@ -25,12 +25,24 @@ public class MoneyController {
             @RequestParam(name = "sortOrder", defaultValue = AppConstants.SORT_ORDER, required = false) String sortOrder
     ) {
         MoneyResponse retrievedMoneyResponse = moneyService.retrieveAllMoney(pageNum, pageSize, sortBy, sortOrder);
-        return new ResponseEntity<>(retrievedMoneyResponse, HttpStatus.OK);
+        return new ResponseEntity<>(retrievedMoneyResponse, HttpStatus.FOUND);
     }
 
     @PostMapping("/public/money")
     public ResponseEntity<MoneyDTO> createMoneyRecord(@Valid @RequestBody MoneyDTO moneyDTO) {
         MoneyDTO moneyDTO1 = moneyService.createMoneyRecord(moneyDTO);
+        return new ResponseEntity<>(moneyDTO1, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/public/money/{moneyId}")
+    public ResponseEntity<MoneyDTO> updateMoneyRecord(@Valid @RequestBody MoneyDTO moneyDTO, @PathVariable Long moneyId) {
+        MoneyDTO moneyDTO1 = moneyService.updateMoneyRecord(moneyDTO,moneyId);
         return new ResponseEntity<>(moneyDTO1, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/public/money/{moneyId}")
+    public ResponseEntity<String> deleteMoneyRecord(@PathVariable Long moneyId) {
+        String message = moneyService.deleteMoneyRecord(moneyId);
+        return new ResponseEntity<>(message, HttpStatus.OK);
     }
 }

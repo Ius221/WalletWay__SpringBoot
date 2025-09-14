@@ -48,17 +48,18 @@ public class MoneyServiceImpl implements MoneyService {
         List<Money> moneyList = moneyPage.getContent();
 
         if(moneyList.isEmpty()) throw new APIException("No money records found");
+        List<Money> moneyWithoutPage = moneyRepository.findAll();
 
-        double totalBalance = moneyList.stream()
+        double totalBalance = moneyWithoutPage.stream()
                 .mapToDouble(Money::getAmount)
                 .sum();
 
-        double totalIncome = moneyList.stream()
+        double totalIncome = moneyWithoutPage.stream()
                 .filter(money -> money.getEntryType().equalsIgnoreCase("income"))
                 .mapToDouble(Money::getAmount)
                 .sum();
 
-        double totalExpense = moneyList.stream()
+        double totalExpense = moneyWithoutPage.stream()
                 .filter(money -> money.getEntryType().equalsIgnoreCase("expense"))
                 .mapToDouble(Money::getAmount)
                 .sum();
@@ -79,4 +80,6 @@ public class MoneyServiceImpl implements MoneyService {
 
         return moneyResponse;
     }
+
+
 }

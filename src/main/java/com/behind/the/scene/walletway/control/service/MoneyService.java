@@ -8,4 +8,6 @@ public interface MoneyService {
     public MoneyResponse retrieveAllMoney(Integer pageNum, Integer pageSize, String sortBy, String sortOrder);
     public MoneyDTO updateMoneyRecord(MoneyDTO moneyDTO, Long moneyId);
     public String deleteMoneyRecord(Long moneyId);
+    public MoneyDTO getMoneyRecordById(Long moneyId);
+    public MoneyResponse fetchByDesc(String description,Integer pageSize, Integer pageNum);
 }

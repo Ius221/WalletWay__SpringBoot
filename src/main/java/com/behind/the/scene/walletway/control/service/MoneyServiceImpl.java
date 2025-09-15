@@ -47,7 +47,7 @@ public class MoneyServiceImpl implements MoneyService {
 
         List<Money> moneyList = moneyPage.getContent();
 
-        if(moneyList.isEmpty()) throw new APIException("No money records found");
+        if (moneyList.isEmpty()) throw new APIException("No money records found");
         List<Money> moneyWithoutPage = moneyRepository.findAll();
 
         double totalBalance = moneyWithoutPage.stream()
@@ -65,13 +65,13 @@ public class MoneyServiceImpl implements MoneyService {
                 .sum();
 
         List<MoneyDTO> moneyDTOSList = moneyList.stream()
-                .map(money-> modelMapper.map(money, MoneyDTO.class))
+                .map(money -> modelMapper.map(money, MoneyDTO.class))
                 .toList();
 
         MoneyResponse moneyResponse = new MoneyResponse();
         moneyResponse.setContent(moneyDTOSList);
         moneyResponse.setPageSize(moneyPage.getSize());
-        moneyResponse.setPageNo(moneyPage.getTotalPages());
+        moneyResponse.setPageNo(moneyPage.getNumber());
         moneyResponse.setTotalElements(moneyPage.getTotalElements());
         moneyResponse.setTotalPages(moneyPage.getTotalPages());
         moneyResponse.setTotalBalance(totalBalance);
@@ -105,12 +105,46 @@ public class MoneyServiceImpl implements MoneyService {
 
         Money moneyData = moneyRepository
                 .findById(moneyId)
-                .orElseThrow(()-> new APIException("Data Not Found"));
+                .orElseThrow(() -> new APIException("Data Not Found"));
 
         moneyRepository.delete(moneyData);
 
-        return "Successfully Deleted the Data with data id: "+moneyId;
+        return "Successfully Deleted the Data with data id: " + moneyId;
     }
 
+    @Override
+    public MoneyDTO getMoneyRecordById(Long moneyId) {
+
+        Money money = moneyRepository
+                .findById(moneyId)
+                .orElseThrow(() -> new APIException("Money record not found"));
+
+        return modelMapper.map(money, MoneyDTO.class);
+
+    }
+
+    @Override
+    public MoneyResponse fetchByDesc(String description,Integer pageSize, Integer pageNum) {
+
+        Pageable pageable = PageRequest.of(pageNum, pageSize);
+        Page<Money> fetchedPage = moneyRepository.searchByDescriptionOrNote("%" + description.trim() + "%",pageable);
+
+        if (fetchedPage.isEmpty()) throw new APIException("No money records found");
+
+        List<Money> moneyList = fetchedPage.getContent();
+
+        List<MoneyDTO> moneyDTOS = moneyList.stream()
+                .map((e) -> modelMapper.map(e, MoneyDTO.class))
+                .toList();
+
+        MoneyResponse moneyResponse = new MoneyResponse();
+        moneyResponse.setContent(moneyDTOS);
+        moneyResponse.setPageNo(fetchedPage.getNumber());
+        moneyResponse.setPageSize(fetchedPage.getSize());
+        moneyResponse.setTotalElements(fetchedPage.getTotalElements());
+        moneyResponse.setTotalPages(fetchedPage.getTotalPages());
+
+        return moneyResponse;
+    }
 
 }

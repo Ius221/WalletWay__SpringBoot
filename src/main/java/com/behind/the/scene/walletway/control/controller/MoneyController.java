@@ -28,6 +28,23 @@ public class MoneyController {
         return new ResponseEntity<>(retrievedMoneyResponse, HttpStatus.FOUND);
     }
 
+    @GetMapping("/public/money/{moneyId}")
+    public ResponseEntity<MoneyDTO> getMoneyRecordById(@PathVariable Long moneyId) {
+        MoneyDTO money = moneyService.getMoneyRecordById(moneyId);
+        return new ResponseEntity<>(money, HttpStatus.FOUND);
+    }
+
+    @GetMapping("/public/money/description")
+    public ResponseEntity<MoneyResponse> fetchMoneyByDescription(
+            @RequestParam String search,
+            @RequestParam(name = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+            @RequestParam(name="pageNumber", defaultValue= AppConstants.PAGE_NUMBER, required = false) Integer pageNum
+
+    ) {
+        MoneyResponse response = moneyService.fetchByDesc(search, pageSize, pageNum);
+        return new ResponseEntity<>(response, HttpStatus.FOUND);
+    }
+
     @PostMapping("/public/money")
     public ResponseEntity<MoneyDTO> createMoneyRecord(@Valid @RequestBody MoneyDTO moneyDTO) {
         MoneyDTO moneyDTO1 = moneyService.createMoneyRecord(moneyDTO);
@@ -36,7 +53,7 @@ public class MoneyController {
 
     @PutMapping("/public/money/{moneyId}")
     public ResponseEntity<MoneyDTO> updateMoneyRecord(@Valid @RequestBody MoneyDTO moneyDTO, @PathVariable Long moneyId) {
-        MoneyDTO moneyDTO1 = moneyService.updateMoneyRecord(moneyDTO,moneyId);
+        MoneyDTO moneyDTO1 = moneyService.updateMoneyRecord(moneyDTO, moneyId);
         return new ResponseEntity<>(moneyDTO1, HttpStatus.OK);
     }
 
@@ -45,4 +62,6 @@ public class MoneyController {
         String message = moneyService.deleteMoneyRecord(moneyId);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
+
+
 }
